@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "hour_sheet"
+version = "0.0.1"
+description = "simple hour sheet program"
+authors = ["lars jaatun <lars.jaatun@adresseavisen.no>"]
+readme = "README.md"
+packages = [{include = "src/hour_sheet.py"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[tool.poetry.group.dev.dependencies]
+assertpy = "^1.1"
+pytest = "^7.2.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+python_classes = "*Test"
+python_files = "*_test.py"
+python_functions = "should_*"
+addopts = [
+    "--import-mode=importlib",
+]
+pythonpath = ["src", "."]
