@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "hour_sheet"
+name = "hoursheet"
 version = "0.0.1"
 description = "simple hour sheet program"
 authors = ["lars jaatun <lars.jaatun@adresseavisen.no>"]
 readme = "README.md"
-packages = [{include = "src/hour_sheet.py"}]
+packages = [{include = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"

@@ -1,7 +1,7 @@
 import datetime
 import os
 from assertpy import assert_that
-from src.hour_sheet import hourSheet
+from src.hoursheet import hourSheet
 import pytest
 
 CURRENT_DAY = datetime.datetime.now().day
@@ -60,6 +60,11 @@ def should_create_summary_of_hours_for_week_given_date_within_that_week(hour_she
     hours_worked_in_week = hour_sheet.get_week_summary_given_date(date, month)
     assert_that(hours_worked_in_week).is_equal_to(10)
 
+def should_parse_text_file_and_create_hour_sheet_object_from_text_file():
+    loaded_hour_sheet = hourSheet.from_text_file("timeliste.txt")
+    assert_that(loaded_hour_sheet).is_instance_of(hourSheet)
+
+
 def should_show_graphical_representation_of_hours_worked():
     pass
 def should_save_file_as_txt_file_independent_of_class_structure():
@@ -75,9 +80,6 @@ def should_calculate_how_many_hours_need_to_be_worked_to_work_a_full_week():
 #     hours_worked_in_a_given_week = hour_sheet.get_week_summary(week_number)
 #     assert_that(hours_worked_in_a_given_week).is_equal_to(8)
 
-# def should_parse_text_file_and_create_hour_sheet_object_from_text_file():
-#     loaded_hour_sheet = hourSheet.from_text_file("timer.txt")
-#     assert_that(loaded_hour_sheet).is_instance_of(hourSheet)
 
 
 @pytest.fixture
