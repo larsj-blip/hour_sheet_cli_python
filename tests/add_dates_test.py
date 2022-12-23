@@ -1,7 +1,7 @@
 import datetime
 import os
 from assertpy import assert_that
-from src.hoursheet import hourSheet
+from hoursheet.hoursheet import hourSheet
 import pytest
 
 CURRENT_DAY = datetime.datetime.now().day
