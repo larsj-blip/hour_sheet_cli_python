@@ -7,4 +7,4 @@ simple hour sheet program. Italian style!
 [] make the json repr the standard save method
 [] visual representation of hours
 [] update function
-[] create domain model(?) make an actual plan instead of creating bolognese
+[] create domain model(?)(NOPE) make an actual plan instead of creating bolognese(YES)
