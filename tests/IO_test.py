@@ -42,6 +42,11 @@ def should_load_file_from_json_representation():
     assert_that(hour_sheet).is_instance_of(hourSheet)
     assert_that(hour_sheet.list_days()).is_not_empty()
 
+def should_save_hoursheet_using_default_name_containing_year():
+    hour_sheet = hourSheet()
+    hour_sheet.save()
+    assert_that(Path(""))
+
 
 
     

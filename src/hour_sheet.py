@@ -4,7 +4,6 @@ import json
 import pickle
 import jsonpickle
 
-from src.hour_sheet_encoder import HourSheetEncoder
 
 
 class hourSheet:
@@ -37,8 +36,8 @@ class hourSheet:
         )
         self.insert_new_entry_for_current_day(current_day_end_time, "end")
 
-    def __transform_timedelta_to_hours(self, hours_worked):
-        return hours_worked.total_seconds() // 3600
+    def __transform_timedelta_to_int(self, hours_worked):
+        return hours_worked.total_seconds() / 3600
 
     def insert_new_entry_for_current_day(
         self, current_day: datetime.datetime, entry_type: str
@@ -86,22 +85,25 @@ class hourSheet:
     def get_summary_for_date(self, day, month):
         workday = self.get_workday(day, month)
         hours_worked_as_timedelta = workday["end"] - workday["start"]
-        return self.__transform_timedelta_to_hours(hours_worked_as_timedelta)
+        return self.__transform_timedelta_to_int(hours_worked_as_timedelta)
 
     def get_week_summary_given_date(self, date, month):
         this_year = datetime.datetime.now().year
-        week_number = datetime.datetime(this_year, month, date).isocalendar().week
+        date_datetime = datetime.datetime(this_year, month, date)
+        _, week_number, week_day  = date_datetime.isocalendar()
+        day_of_week = date_datetime - datetime.timedelta(week_day-1)
         total_hours = 0
-        for date in self.__list_days[str(month)]:
-            workday = self.get_workday(date, month)
-            if workday["start"].isocalendar().week == week_number:
-                total_hours += self.get_summary_for_date(date, month)
+        while day_of_week.isocalendar().week == week_number:
+            if self.get_workday(day_of_week.day, day_of_week.month):
+                total_hours += self.get_summary_for_date(day=day_of_week.day, month=day_of_week.month)
+            day_of_week += datetime.timedelta(1)
         return total_hours
 
     def get_current_week_summary(self):
         day_now, month_now = self.get_todays_day_and_month()
         return self.get_week_summary_given_date(date=day_now, month=month_now)
-
+        
+        
 
 ##### IO SECTION #####
 

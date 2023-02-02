@@ -6,7 +6,9 @@ from src.hour_sheet import hourSheet
 CURRENT_DAY = datetime.datetime.now().day
 CURRENT_MONTH = datetime.datetime.now().month
 START_TIME_AS_INT = 800
-END_TIME_AS_INT = 1800
+END_TIME_AS_INT = 1830
+EXPECTED_WORK_WEEK_HOURS = 52.5
+EXPECTED_WORK_DAY_HOURS = 10.5
 TEST_FILE_NAME = "test_file"
 
 
