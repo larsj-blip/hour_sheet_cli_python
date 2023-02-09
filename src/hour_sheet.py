@@ -4,12 +4,16 @@ import json
 import pickle
 import jsonpickle
 
+CURRENT_YEAR = datetime.date.year
+DEFAULT_FILE_NAME = f"timeliste_json_ish_for_år_{CURRENT_YEAR}.json"
 
 
 class hourSheet:
-    def __init__(self):
+
+    def __init__(self, filename=DEFAULT_FILE_NAME):
         month_dictionaries = [defaultdict(dict) for x in range(12)]
         self.__list_days = {str(month+1): dictionary for month, dictionary in enumerate(month_dictionaries)}
+        self.filename = filename
 
     def start_today(self, time:int):
         day_now, month_now = self.get_todays_day_and_month()
@@ -80,6 +84,14 @@ class hourSheet:
         )
         return start_time_for_current_day
 
+    
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, tb):
+        self.save_json(self.filename)
+
+
 ###### STATISTICS SECTION ######
 
     def get_summary_for_date(self, day, month):
@@ -139,9 +151,10 @@ class hourSheet:
             return hour_sheet_from_txt
     
     @classmethod
-    def from_JSON(cls, filename:str):
-        with open(filename, mode="r", encoding="cp1257") as external_file:
+    def from_json(cls, filename:str):
+        with open(filename, mode="r", encoding="utf-8") as external_file:
             hour_sheet_string = external_file.read()
             hour_sheet_obj = jsonpickle.decode(hour_sheet_string)
-            # hour_sheet_obj = jsonpickle.decode(hour_sheet_obj)
+            hour_sheet_obj.filename = filename
             return hour_sheet_obj
+        

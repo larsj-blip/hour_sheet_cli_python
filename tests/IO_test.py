@@ -3,6 +3,7 @@ import json
 import os
 import sys
 from pathlib import Path
+from unittest.mock import patch
 import pytest
 
 import chardet
@@ -38,14 +39,16 @@ def should_save_file_as_json_file_independent_of_class_structure(hour_sheet_with
         assert_that(hour_sheet_str).contains(*ALL_MONTHS)
 
 def should_load_file_from_json_representation():
-    hour_sheet = hourSheet.from_JSON(TEST_FILE_NAME.with_suffix(".json"))
+    hour_sheet = hourSheet.from_json(TEST_FILE_NAME.with_suffix(".json"))
     assert_that(hour_sheet).is_instance_of(hourSheet)
     assert_that(hour_sheet.list_days()).is_not_empty()
 
-def should_save_hoursheet_using_default_name_containing_year():
-    hour_sheet = hourSheet()
-    hour_sheet.save()
-    assert_that(Path(""))
+@patch('src.hour_sheet.hourSheet.save_json')
+def should_save_file_after_exiting_context(mock_save):
+    hour_sheet = hourSheet(filename=str(TEST_FILE_NAME))
+    with hour_sheet:
+        hour_sheet.start_today(800)
+    hourSheet.save_json.assert_called()
 
 
 

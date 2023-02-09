@@ -10,7 +10,6 @@ from tests.conftest import EXPECTED_WORK_DAY_HOURS, EXPECTED_WORK_WEEK_HOURS
 
 CURRENT_DAY = datetime.datetime.now().day
 CURRENT_MONTH = datetime.datetime.now().month
-TOTAL_HOURS_FOR_ONE_WORKWEEK = 50
 
 
 def should_return_summary_of_hours_worked_for_a_given_date_as_int(hour_sheet_with_full_workday):

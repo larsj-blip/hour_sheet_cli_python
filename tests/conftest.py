@@ -1,4 +1,5 @@
 import datetime
+from unittest.mock import patch
 import pytest
 from src.hour_sheet import hourSheet
 
@@ -37,15 +38,9 @@ def temp_hour_sheet_with_start_date():
     return hour_sheet
 
 
-
-
-
-
-
-
-
 def get_current_weeks_monday():
     today = datetime.datetime.now()
     weekday = today.weekday()
     monday = today - datetime.timedelta(days=weekday-1)
     return monday
+

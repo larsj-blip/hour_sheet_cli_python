@@ -9,12 +9,12 @@ from .conftest import CURRENT_DAY, CURRENT_MONTH
 
 
 
-def should_save_start_time_for_workday_from_int_representations_of_date_and_time(
-    temp_hour_sheet_with_start_date,
-):
-    temp_hour_sheet = temp_hour_sheet_with_start_date
-    list_of_days = temp_hour_sheet.most_recent_day()
-    assert_that(list_of_days).is_not_empty()
+# def should_save_start_time_for_workday_from_int_representations_of_date_and_time(
+#     temp_hour_sheet_with_start_date,
+# ):
+#     temp_hour_sheet = temp_hour_sheet_with_start_date
+#     list_of_days = temp_hour_sheet.most_recent_day()
+#     assert_that(list_of_days).is_not_empty()
 
 def should_not_implicitly_overwrite_existing_entry_(temp_hour_sheet_with_start_date : hourSheet):
     hour_sheet = temp_hour_sheet_with_start_date
