@@ -1,7 +1,7 @@
 import argparse
 from dataclasses import dataclass
 
-from .hour_sheet import hourSheet
+from hour_sheet import hourSheet
 DEFAULT_FILE = "timeliste_2023_tru.json"
 
 
