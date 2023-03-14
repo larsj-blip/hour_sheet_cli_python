@@ -12,7 +12,7 @@ class mock_namespace:
     entry_type: str
     time: int
 
-@patch.object(hour_sheet.hourSheet, "start_today")
+@patch.object(src.hour_sheet.hourSheet, "start_today")
 def should_start_day_given_command_line_args_with_start_flag_and_int_corresponding_to_time(mocked_hoursheet):
     start_day_input = mock_namespace(entry_type="start", time=START_TIME)
     hour_sheet_utils.add_entry_to_hoursheet(mocked_hoursheet, start_day_input, TEST_FILE_NAME)
