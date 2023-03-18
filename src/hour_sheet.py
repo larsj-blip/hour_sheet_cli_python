@@ -1,5 +1,6 @@
 import datetime
 from collections import defaultdict
+from functools import reduce
 import json
 import pickle
 import jsonpickle
@@ -91,6 +92,11 @@ class hourSheet:
     def __exit__(self, type, value, tb):
         self.save_json(self.filename)
 
+    @staticmethod
+    def is_valid_date_entry(entry: dict):
+        if "start" in entry and "end" in entry:
+            return True
+        return False
 
 ###### STATISTICS SECTION ######
 
@@ -114,8 +120,27 @@ class hourSheet:
     def get_current_week_summary(self):
         day_now, month_now = self.get_todays_day_and_month()
         return self.get_week_summary_given_date(date=day_now, month=month_now)
+
+    def get_summary_given_iso_week(self, week_number):
+        this_year = datetime.datetime.now().year
+        day_in_week = datetime.datetime.fromisocalendar(this_year, week_number, day=1)
+        total_hours = 0
+        while day_in_week.isocalendar().week == week_number:
+            if self.get_workday(day_in_week.day, day_in_week.month):
+                total_hours += self.get_summary_for_date(day=day_in_week.day, month=day_in_week.month)
+            day_in_week += datetime.timedelta(1)
+        return total_hours
         
-        
+    
+
+    def get_invalid_entries_in_month(self, month:str) -> dict:
+        month_of_entries = self.list_days().get(month)
+        invalid_day_keys = filter(lambda workday : not self.is_valid_date_entry(month_of_entries[workday]), month_of_entries)
+        invalid_workdays = {}
+        for key in invalid_day_keys:
+            invalid_workdays[key] = month_of_entries[key]
+        return dict(invalid_workdays)
+
 
 ##### IO SECTION #####
 

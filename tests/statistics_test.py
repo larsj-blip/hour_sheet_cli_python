@@ -30,6 +30,11 @@ def should_show_how_many_hours_worked_in_current_week(hour_sheet_with_full_workw
     hours_worked_current_week = hour_sheet.get_current_week_summary()
     assert_that(hours_worked_current_week).is_close_to(EXPECTED_WORK_WEEK_HOURS, 0.01)
 
+def should_show_all_invalid_dates(workweek_with_missing_end_time):
+    hour_sheet = workweek_with_missing_end_time
+    invalid_entries = hour_sheet.get_invalid_entries_in_month(str(CURRENT_MONTH))
+    assert_that(invalid_entries).is_length(5)
+
 def should_calculate_how_many_hours_remain_get_to_a_full_work_week():
     pass
 
