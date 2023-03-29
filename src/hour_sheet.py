@@ -1,3 +1,4 @@
+from dataclasses import dataclass, field
 import datetime
 from collections import defaultdict
 from functools import reduce
@@ -8,11 +9,26 @@ import jsonpickle
 CURRENT_YEAR = datetime.date.year
 DEFAULT_FILE_NAME = f"timeliste_json_ish_for_år_{CURRENT_YEAR}.json"
 
+@dataclass
+class WorkDay:
+    start: datetime.datetime = field(default=None)
+    end: datetime.datetime = field(default=None)
+
+    def to_json(self):
+        return json.dumps(self.to_dict())
+    
+    def to_dict(self):
+        return {
+            "start": self.start.isoformat(),
+            "end": self.end.isoformat()
+        }
+    
+
 
 class hourSheet:
 
     def __init__(self, filename=DEFAULT_FILE_NAME):
-        month_dictionaries = [defaultdict(dict) for x in range(12)]
+        month_dictionaries = [defaultdict(WorkDay) for x in range(12)]
         self.__all_months_containing_workdays = {str(month+1): dictionary for month, dictionary in enumerate(month_dictionaries)}
         self.filename = filename
 
@@ -33,29 +49,43 @@ class hourSheet:
         current_day_start_time = self.transform_time_as_ints_to_datetime(
             time, day, month
         )
-        self.insert_new_entry_for_current_day(current_day_start_time, "start")
+        self.insert_new_start_day_entry(current_day_start_time, "start")
 
     def end_day(self, time, day, month):
         current_day_end_time = self.transform_time_as_ints_to_datetime(
             time, day, month
         )
-        self.insert_new_entry_for_current_day(current_day_end_time, "end")
-
-    def __transform_timedelta_to_int(self, hours_worked):
-        return hours_worked.total_seconds() / 3600
-
-    def insert_new_entry_for_current_day(
+        self.insert_new_start_day_entry(current_day_end_time, "end")
+   
+    def insert_new_start_day_entry(
         self, current_day: datetime.datetime, entry_type: str
     ):
         key_for_current_day = str(current_day.day)
         key_for_current_month = str(current_day.month)
-        if entry_type in self.list_days()[key_for_current_month][key_for_current_day]:
+        if self.list_days()[key_for_current_month][key_for_current_day]:
             print("This date already exists. To overwrite, use the overwrite function.")
         else:
+            workday = WorkDay()
             workday_dictionary = {entry_type: current_day}
             self.__all_months_containing_workdays[key_for_current_month][key_for_current_day].update(
                 workday_dictionary
             )
+    def insert_new_start_day_entry(
+        self, current_day: datetime.datetime
+    ):
+        key_for_current_day = str(current_day.day)
+        key_for_current_month = str(current_day.month)
+        if self.list_days()[key_for_current_month][key_for_current_day].start:
+            print("This date already exists. To overwrite, use the overwrite function.")
+        else:
+            workday = WorkDay(start=current_day)
+            self.__all_months_containing_workdays[key_for_current_month][key_for_current_day].update(
+                workday_dictionary
+            )
+
+    def __transform_timedelta_to_int(self, hours_worked):
+        return hours_worked.total_seconds() / 3600
+
 
     def add_full_workday(self, date, month, start_time, end_time):
         self.start_day(start_time, date, month)
