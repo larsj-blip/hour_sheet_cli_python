@@ -13,7 +13,7 @@ class hourSheet:
 
     def __init__(self, filename=DEFAULT_FILE_NAME):
         month_dictionaries = [defaultdict(dict) for x in range(12)]
-        self.__list_days = {str(month+1): dictionary for month, dictionary in enumerate(month_dictionaries)}
+        self.__all_months_containing_workdays = {str(month+1): dictionary for month, dictionary in enumerate(month_dictionaries)}
         self.filename = filename
 
     def start_today(self, time:int):
@@ -53,7 +53,7 @@ class hourSheet:
             print("This date already exists. To overwrite, use the overwrite function.")
         else:
             workday_dictionary = {entry_type: current_day}
-            self.__list_days[key_for_current_month][key_for_current_day].update(
+            self.__all_months_containing_workdays[key_for_current_month][key_for_current_day].update(
                 workday_dictionary
             )
 
@@ -63,13 +63,13 @@ class hourSheet:
                 
 
     def get_most_recent_hoursheet_entry(self) -> dict:
-        return self.__list_days[str(datetime.datetime.now().month)][str(datetime.datetime.now().day)]
+        return self.__all_months_containing_workdays[str(datetime.datetime.now().month)][str(datetime.datetime.now().day)]
 
     def list_days(self):
-        return self.__list_days
+        return self.__all_months_containing_workdays
 
     def get_workday(self, day: int, month: int):
-        return self.__list_days[str(month)][str(day)]
+        return self.__all_months_containing_workdays[str(month)][str(day)]
 
     def transform_time_as_ints_to_datetime(
         self, time_as_int, current_day_as_int, current_month_as_int
