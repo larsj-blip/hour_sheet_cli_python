@@ -29,7 +29,7 @@ def should_differentiate_between_workdays_from_different_months(hour_sheet_with_
     new_month = (CURRENT_MONTH+1)%12
     hour_sheet.start_day(900, CURRENT_DAY, new_month)
     hour_sheet.end_day(1700, CURRENT_DAY, new_month)
-    assert_that(len(hour_sheet.list_days())).is_greater_than(1)
+    assert_that(len(hour_sheet.all_data())).is_greater_than(1)
 
 def should_not_end_workday_that_does_not_have_start():
     pass
