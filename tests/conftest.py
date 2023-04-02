@@ -1,8 +1,6 @@
 import datetime
-from unittest.mock import patch
 import pytest
 from src.hour_sheet import hourSheet
-
 
 CURRENT_DAY = datetime.datetime.now().day
 CURRENT_MONTH = datetime.datetime.now().month
@@ -22,7 +20,7 @@ def hour_sheet_with_full_workweek():
         hour_sheet.end_day(END_TIME_AS_INT, current_weeks_monday.day, current_weeks_monday.month)
         current_weeks_monday += datetime.timedelta(days=1)
     return hour_sheet
-        
+
 
 @pytest.fixture
 def workweek_with_missing_end_time():
@@ -32,6 +30,7 @@ def workweek_with_missing_end_time():
         hour_sheet.start_day(START_TIME_AS_INT, current_weeks_monday.day, current_weeks_monday.month)
         current_weeks_monday += datetime.timedelta(days=1)
     return hour_sheet
+
 
 @pytest.fixture
 def hour_sheet_with_full_workday(temp_hour_sheet_with_start_date):
@@ -50,6 +49,5 @@ def temp_hour_sheet_with_start_date():
 def get_current_weeks_monday():
     today = datetime.datetime.now()
     weekday = today.weekday()
-    monday = today - datetime.timedelta(days=weekday-1)
+    monday = today - datetime.timedelta(days=weekday - 1)
     return monday
-

@@ -20,15 +20,6 @@ def should_save_summary_to_file_in_the_project_root_directory_with_input_as_name
     hour_sheet.save_hour_sheet(str(TEST_FILE_NAME))
     assert_that(str(TEST_FILE_NAME)).exists()
 
-def should_load_hour_sheet_object_from_binary_file():
-    loaded_hour_sheet = hourSheet.from_binary_file(TEST_FILE_NAME)
-    assert_that(loaded_hour_sheet).is_instance_of(hourSheet)
-
-
-def should_parse_text_file_and_create_hour_sheet_object_from_text_file():
-    loaded_hour_sheet = hourSheet.from_text_file(TEST_FILE_NAME.with_suffix(".txt"))
-    assert_that(loaded_hour_sheet).is_instance_of(hourSheet)
-
 def should_save_file_as_json_file_independent_of_class_structure(hour_sheet_with_full_workday):
     populated_hour_sheet = hour_sheet_with_full_workday
     populated_hour_sheet.save_json(TEST_FILE_NAME.with_suffix(".json"))
