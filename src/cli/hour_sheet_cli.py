@@ -1,6 +1,6 @@
 import argparse
 from dataclasses import dataclass
-from hour_sheet_utils import add_entry_to_hoursheet
+from src.cli.hour_sheet_cli_utils import add_entry_to_hoursheet
 
 
 

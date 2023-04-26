@@ -2,9 +2,7 @@ from dataclasses import dataclass, field
 import datetime
 from collections import defaultdict
 import json
-import pickle
-import jsonpickle
-import pathlib
+from typing import Optional
 
 CURRENT_YEAR = datetime.date.year
 DEFAULT_FILE_NAME = f"timeliste_json_ish_for_år_{CURRENT_YEAR}.json"
@@ -13,7 +11,7 @@ DEFAULT_FILE_NAME = f"timeliste_json_ish_for_år_{CURRENT_YEAR}.json"
 @dataclass
 class WorkDay:
     start: datetime.datetime = field(init=False, default=None)
-    end: datetime.datetime = field(init=False, default=None)
+    end: Optional[datetime.datetime] = field(init=False, default=None)
 
     def start_day(self, date: datetime.datetime):
         if not self.start:
@@ -33,20 +31,21 @@ class WorkDay:
         return json.dumps(self.to_dict())
 
     def to_dict(self):
-        return {
-            "start": self.start.isoformat(),
-            "end": self.end.isoformat()
-        }
-
+        worksheet_dictionary = {"start": self.start.isoformat()}
+        if self.end:
+            worksheet_dictionary["end"] = self.end.isoformat()
+        return worksheet_dictionary
     @staticmethod
     def from_dict(workday_as_dict):
         workday = WorkDay()
-        workday.start = datetime.datetime.fromisoformat(workday_as_dict.get("start"))
+        if "start" in workday_as_dict:
+            workday.start = datetime.datetime.fromisoformat(workday_as_dict.get("start"))
         if "end" in workday_as_dict:
             workday.end = datetime.datetime.fromisoformat(workday_as_dict.get("end"))
         return workday
-class hourSheet:
 
+
+class HourSheet:
 
     def __init__(self, filename=DEFAULT_FILE_NAME):
         month_dictionaries = [defaultdict(WorkDay) for _ in range(12)]
@@ -81,16 +80,22 @@ class hourSheet:
         self.insert_new_end_day_entry(current_day_end_time)
 
     def insert_new_end_day_entry(self, current_day: datetime.datetime):
-        key_for_current_day = str(current_day.day)
-        key_for_current_month = str(current_day.month)
-        workday = self.all_data()[key_for_current_month][key_for_current_day]
+        workday = self.fetch_existing_or_create_new_workday(current_day)
         workday.end_day(current_day)
+        self.__all_months_containing_workdays[str(current_day.month)][str(current_day.day)] = workday
 
     def insert_new_start_day_entry(self, current_day: datetime.datetime):
+        workday = self.fetch_existing_or_create_new_workday(current_day)
+        workday.start_day(current_day)
+        self.__all_months_containing_workdays[str(current_day.month)][str(current_day.day)] = workday
+
+    def fetch_existing_or_create_new_workday(self, current_day):
         key_for_current_day = str(current_day.day)
         key_for_current_month = str(current_day.month)
-        workday = self.__all_months_containing_workdays[key_for_current_month][key_for_current_day]
-        workday.start_day(current_day)
+        all_data = self.all_data()
+        month = all_data.get(key_for_current_month)
+        workday = month.get(key_for_current_day, WorkDay())
+        return workday
 
     @staticmethod
     def __transform_timedelta_to_int(hours_worked):
@@ -100,15 +105,11 @@ class hourSheet:
         self.start_day(start_time, date, month)
         self.end_day(end_time, date, month)
 
-    def get_most_recent_hoursheet_entry(self) -> dict:
-        return self.__all_months_containing_workdays[str(datetime.datetime.now().month)][
-            str(datetime.datetime.now().day)]
-
     def all_data(self):
         return self.__all_months_containing_workdays
 
     def get_workday(self, day: int, month: int):
-        return self.__all_months_containing_workdays[str(month)][str(day)]
+        return self.__all_months_containing_workdays.get(str(month)).get(str(day))
 
     @staticmethod
     def transform_time_as_ints_to_datetime(time_as_int, current_day_as_int, current_month_as_int) -> datetime.datetime:
@@ -127,7 +128,7 @@ class hourSheet:
         return self
 
     def __exit__(self, type_var, value, tb):
-        self.save_json(self.filename)
+        self.save(self.filename)
 
     @staticmethod
     def is_valid_date_entry(entry: WorkDay):
@@ -149,7 +150,8 @@ class hourSheet:
         day_of_week = date_datetime - datetime.timedelta(week_day - 1)
         total_hours = 0
         while day_of_week.isocalendar().week == week_number:
-            if self.get_workday(day_of_week.day, day_of_week.month).start:
+            workday = self.get_workday(day_of_week.day, day_of_week.month)
+            if workday and workday.start and workday.end:
                 total_hours += self.get_summary_for_date(day=day_of_week.day, month=day_of_week.month)
             day_of_week += datetime.timedelta(1)
         return total_hours
@@ -168,11 +170,10 @@ class hourSheet:
             day_in_week += datetime.timedelta(1)
         return total_hours
 
-    def get_invalid_entries_in_month(self, month: str) -> dict:
-        month_of_entries = self.all_data().get(month)
-        invalid_days = filter(lambda workday: not self.is_valid_date_entry(month_of_entries[workday]),
-                                  month_of_entries)
-        return [invalid_day for invalid_day in invalid_days]
+    # def get_invalid_entries_in_month(self, month: str) -> list:
+    #     month_of_entries = self.all_data().get(month)
+    #     invalid_days = [date for date, workday in month_of_entries.items() if self.is_valid_date_entry(workday)]
+    #     return invalid_days
 
     # IO SECTION
 
@@ -186,39 +187,25 @@ class hourSheet:
             year_dictionary[month] = month_dictionary
         return year_dictionary
 
-
     def save(self, filename):
         with open(file=filename, mode="w") as file:
             hour_sheet = self.to_dict()
             json.dump(hour_sheet, fp=file)
 
-    def save_hour_sheet(self, filename: str):
-        with open(filename, mode="wb") as external_file_storage:
-            pickle.dump(self, external_file_storage)
-
-    def save_json(self, filename: str):
-        with open(file=filename, mode="w") as json_file:
-            hour_sheet_json = jsonpickle.encode(self)
-            json_file.write(hour_sheet_json)
-
-    @staticmethod
-    def from_binary_file(filename: str):
-        with open(filename, mode="rb") as external_file_storage:
-            hour_sheet = pickle.load(external_file_storage)
-            return hour_sheet
-
-
     @classmethod
     def from_json(cls, filename: str):
         with open(filename, mode="r", encoding="utf-8") as external_file:
-            hour_sheet = hourSheet(filename=filename)
-            hour_sheet_string = external_file.read()
-            year_dict = json.loads(hour_sheet_string)
-            for month, month_values in year_dict.items():
-                month_dict = defaultdict(WorkDay)
-                for day, day_values in month_values.items():
-                    month_dict[day] = WorkDay.from_dict(day_values)
-                year_dict[month] = month_dict
-            hour_sheet.__all_months_containing_workdays = year_dict
+            hour_sheet = HourSheet(filename=filename)
+            hour_sheet_string = "".join(external_file.readlines())
+            all_months_list = json.loads(hour_sheet_string)
+            all_months = {month: cls.create_hour_sheet_objects_for_month(month_dict) for month, month_dict in
+                          all_months_list.items()}
+            hour_sheet.__all_months_containing_workdays = all_months
             return hour_sheet
 
+    @classmethod
+    def create_hour_sheet_objects_for_month(cls, year_dict):
+        month_dict = {}
+        for day, day_values in year_dict.items():
+            month_dict[day] = WorkDay.from_dict(day_values)
+        return month_dict

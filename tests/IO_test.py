@@ -3,10 +3,19 @@ from unittest.mock import patch
 
 from assertpy import assert_that
 
-from src.hour_sheet import hourSheet
+from src.hour_sheet import HourSheet
 
 ALL_MONTHS = [str(month+1) for month in range(12)]
-TEST_FILE_NAME = Path("./resources/test_file")
+
+
+def create_test_file_path():
+    global TEST_FILE_NAME
+    if Path.cwd().name == "hour_sheet":
+        return Path(Path.cwd(), "tests", "resources", "test_file")
+    return Path(Path.cwd(), "resources", "test_file")
+
+
+TEST_FILE_NAME = create_test_file_path()
 
 
 def should_save_file_as_json_file_independent_of_class_structure(hour_sheet_with_full_workday):
@@ -28,16 +37,16 @@ def should_convert_hour_sheet_to_json_compatible_dictionary(hour_sheet_with_full
 
 
 def should_load_file_from_json_representation():
-    hour_sheet = hourSheet.from_json(str(TEST_FILE_NAME.with_suffix(".json")))
-    assert_that(hour_sheet).is_instance_of(hourSheet)
+    hour_sheet = HourSheet.from_json(str(TEST_FILE_NAME.with_suffix(".json")))
+    assert_that(hour_sheet).is_instance_of(HourSheet)
     assert_that(hour_sheet.all_data()).is_not_empty()
 
-@patch('src.hour_sheet.hourSheet.save_json')
+@patch('src.hour_sheet.HourSheet.save')
 def should_save_file_after_exiting_context(mock_save):
-    hour_sheet = hourSheet(filename=str(TEST_FILE_NAME))
+    hour_sheet = HourSheet(filename=str(TEST_FILE_NAME))
     with hour_sheet:
         hour_sheet.start_today(800)
-    hourSheet.save_json.assert_called()
+    HourSheet.save.assert_called()
 
 
 
