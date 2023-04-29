@@ -8,8 +8,6 @@ packages = [{include = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-jsonpickle = "^3.0.1"
-chardet = "^5.1.0"
 
 
 [tool.poetry.group.dev.dependencies]

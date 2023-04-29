@@ -11,3 +11,4 @@ simple hour sheet program. Italian style!
 - [ ] rewrite tests
 - [ ] merge diverging hour sheet versions
 - [ ] cli
+- [ ] Hour sheet that stores project as well
