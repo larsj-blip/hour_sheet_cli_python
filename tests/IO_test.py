@@ -1,54 +1,52 @@
-import datetime
-import json
-import os
-import sys
 from pathlib import Path
 from unittest.mock import patch
-import pytest
 
-import chardet
 from assertpy import assert_that
 
-from src.hour_sheet import hourSheet
+from src.hour_sheet import HourSheet
 
 ALL_MONTHS = [str(month+1) for month in range(12)]
-TEST_FILE_NAME = Path("./tests/resources/test_file")
 
 
-def should_save_summary_to_file_in_the_project_root_directory_with_input_as_name(hour_sheet_with_full_workday):
-    hour_sheet = hour_sheet_with_full_workday
-    hour_sheet.save_hour_sheet(str(TEST_FILE_NAME))
-    assert_that(str(TEST_FILE_NAME)).exists()
-
-def should_load_hour_sheet_object_from_binary_file():
-    loaded_hour_sheet = hourSheet.from_binary_file(TEST_FILE_NAME)
-    assert_that(loaded_hour_sheet).is_instance_of(hourSheet)
+def create_test_file_path():
+    global TEST_FILE_NAME
+    if Path.cwd().name == "hour_sheet":
+        return Path(Path.cwd(), "tests", "resources", "test_file")
+    return Path(Path.cwd(), "resources", "test_file")
 
 
-def should_parse_text_file_and_create_hour_sheet_object_from_text_file():
-    loaded_hour_sheet = hourSheet.from_text_file(TEST_FILE_NAME.with_suffix(".txt"))
-    assert_that(loaded_hour_sheet).is_instance_of(hourSheet)
+TEST_FILE_NAME = create_test_file_path()
+
 
 def should_save_file_as_json_file_independent_of_class_structure(hour_sheet_with_full_workday):
     populated_hour_sheet = hour_sheet_with_full_workday
-    populated_hour_sheet.save_json(TEST_FILE_NAME.with_suffix(".json"))
+    populated_hour_sheet.save(TEST_FILE_NAME.with_suffix(".json"))
     with open(TEST_FILE_NAME.with_suffix(".json"), "r") as hour_sheet_file:
         hour_sheet_str_list = hour_sheet_file.readlines()
         hour_sheet_str = "".join(hour_sheet_str_list)
         assert_that(hour_sheet_str).is_not_empty()
         assert_that(hour_sheet_str).contains(*ALL_MONTHS)
 
-def should_load_file_from_json_representation():
-    hour_sheet = hourSheet.from_json(TEST_FILE_NAME.with_suffix(".json"))
-    assert_that(hour_sheet).is_instance_of(hourSheet)
-    assert_that(hour_sheet.list_days()).is_not_empty()
+def should_convert_hour_sheet_to_json_compatible_dictionary(hour_sheet_with_full_workweek):
+    hour_sheet = hour_sheet_with_full_workweek
+    jsondict = hour_sheet.to_dict()
+    assert_that(jsondict).is_instance_of(dict)
+    assert_that(jsondict).is_not_empty()
 
-@patch('src.hour_sheet.hourSheet.save_json')
+
+
+
+def should_load_file_from_json_representation():
+    hour_sheet = HourSheet.from_json(str(TEST_FILE_NAME.with_suffix(".json")))
+    assert_that(hour_sheet).is_instance_of(HourSheet)
+    assert_that(hour_sheet.all_data()).is_not_empty()
+
+@patch('src.hour_sheet.HourSheet.save')
 def should_save_file_after_exiting_context(mock_save):
-    hour_sheet = hourSheet(filename=str(TEST_FILE_NAME))
+    hour_sheet = HourSheet(filename=str(TEST_FILE_NAME))
     with hour_sheet:
         hour_sheet.start_today(800)
-    hourSheet.save_json.assert_called()
+    HourSheet.save.assert_called()
 
 
 

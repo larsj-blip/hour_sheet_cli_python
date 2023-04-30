@@ -4,7 +4,11 @@ simple hour sheet program. Italian style!
 
 ## TODOs
 
-[] make the json repr the standard save method
-[] visual representation of hours
-[] update function
-[] create domain model(?)(NOPE) make an actual plan instead of creating bolognese(YES)
+- [X] make the json repr the standard save method
+- [ ] visual representation of hours (realpython dash)
+- [ ] update function (function for updating an erroneous entry)
+- [X] hour sheet dictionaries as objects
+- [ ] rewrite tests
+- [ ] merge diverging hour sheet versions
+- [ ] cli
+- [ ] Hour sheet that stores project as well
