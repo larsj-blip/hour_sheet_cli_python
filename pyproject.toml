@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "hoursheet"
-version = "0.0.2"
+version = "0.0.3"
 description = "simple hour sheet program"
 authors = ["lars jaatun <lars.jaatun@adresseavisen.no>"]
 readme = "README.md"
@@ -8,6 +8,9 @@ packages = [{include = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
+
+[tool.poetry.scripts]
+greet = "src.cli.hour_sheet_cli"
 
 
 [tool.poetry.group.dev.dependencies]
